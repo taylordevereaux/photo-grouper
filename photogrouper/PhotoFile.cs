@@ -1,16 +1,17 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TagLib;
 
-namespace PhotoGrouper.Managers
+namespace PhotoGrouper
 {
     /// <summary>
     /// Defines the file 
     /// </summary>
-    public class MediaFile
+    public class PhotoFile
     {
         /// <summary>
         /// Creates a new Media File Instance.
@@ -19,7 +20,7 @@ namespace PhotoGrouper.Managers
         /// <param name="date"></param>
         /// <param name="dateCreated"></param>
         /// <param name="file"></param>
-        public MediaFile(string fileName, DateTime date, DateTime dateCreated, File file)
+        public PhotoFile(string fileName, DateTime date, DateTime dateCreated, File file)
         {
             FileName = fileName;
             Date = date;
@@ -42,6 +43,7 @@ namespace PhotoGrouper.Managers
         /// <summary>
         /// The Associated TagLib file that was created.
         /// </summary>
+        [JsonIgnore]
         public TagLib.File File { get; private set; }
 
         

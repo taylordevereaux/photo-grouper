@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhotoGrouper.Managers
+namespace PhotoGrouper
 {
     public class Logger : ILogger
     {

@@ -6,26 +6,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhotoGrouper.Managers
+namespace PhotoGrouper
 {
-    public class MediaFileManager : IMediaFileManager
+    public class PhotoFileProcessor : IPhotoFileProcessor
     {
         /// <summary>
         /// Logger Control.
         /// </summary>
         private ILogger _logger;
 
-        public MediaFileManager(ILogger logger)
+        public PhotoFileProcessor(ILogger logger)
         {
             this._logger = logger;
         }
-
         /// <summary>
         /// Returns all the TagLib Files for the file path.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public async IFileCollection GetFiles(string path)
+        public async Task<IPhotoCollection> GetFiles(string path)
         {
             return await Task.Run(() => GetFilesSync(path));
         }
@@ -34,14 +33,14 @@ namespace PhotoGrouper.Managers
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public IEnumerable<TagLib.File> GetFilesSync(string path)
+        public IPhotoCollection GetFilesSync(string path)
         {
             if (!Directory.Exists(path))
                 throw new ArgumentException("Directory does not exist");
 
             var fileNames = Directory.GetFiles(path);
 
-            List<TagLib.File> files = new List<TagLib.File>();
+            List<PhotoFile> files = new List<PhotoFile>();
 
             foreach (string file in fileNames)
             {
@@ -65,7 +64,7 @@ namespace PhotoGrouper.Managers
                 var tiffFile = tagFile as TagLib.Tiff.File;
                 if (tiffFile != null)
                 {
-                    files.Add(tiffFile);
+                    files.Add(ProcessTagFile(tiffFile, file));
                     _logger.WriteTabbed(file, tiffFile.ImageTag.Exif.DateTime);
                     continue;
                 }
@@ -74,7 +73,7 @@ namespace PhotoGrouper.Managers
                 var imageFile = tagFile as TagLib.Image.File;
                 if (imageFile != null)
                 {
-                    files.Add(imageFile);
+                    files.Add(ProcessTagFile(imageFile, file));
                     _logger.WriteTabbed(file, imageFile.ImageTag.Exif.DateTime);
                     continue;
                 }
@@ -83,15 +82,15 @@ namespace PhotoGrouper.Managers
                 var mp4File = tagFile as TagLib.Mpeg4.File;
                 if (mp4File != null)
                 {
-                    files.Add(mp4File);
+                    files.Add(ProcessTagFile(mp4File, file));
                     _logger.WriteTabbed(file, mp4File.Tag.DateTagged);
                     continue;
                 }
 
                 _logger.WriteLine("Unsupported file: {0}", file);
-
             }
-            return files;
+
+            return new PhotoCollection(files);
         }
 
         /// <summary>
@@ -101,7 +100,7 @@ namespace PhotoGrouper.Managers
         /// <returns></returns>
         public async Task<string> GetFilesJson(string path)
         {
-            return JsonConvert.SerializeObject(await GetFiles(path), new JsonSerializerSettings() { ContractResolver = new TagLibFileContractResolver() });
+            return JsonConvert.SerializeObject(await GetFiles(path));//, new JsonSerializerSettings() { ContractResolver = new FileContractResolver() });
         }
         /// <summary>
         /// Returns all the TagLib Files for the file path in JSON Format.
@@ -110,24 +109,55 @@ namespace PhotoGrouper.Managers
         /// <returns></returns>
         public string GetFilesJsonSync(string path)
         {
-            return JsonConvert.SerializeObject(GetFilesSync(path), new JsonSerializerSettings() { ContractResolver = new TagLibFileContractResolver() });
+            return JsonConvert.SerializeObject(GetFilesSync(path));// new JsonSerializerSettings() { ContractResolver = new TagLibFileContractResolver() });
         }
+
+        #region Private Helper Methods
+
+        /// <summary>
+        /// Implements TagLib.Image.File and TagLib.Tiff.File
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="fullPath"></param>
+        /// <returns></returns>
+        private PhotoFile ProcessTagFile(TagLib.Image.File file, string fullPath)
+        {
+            var exif = file.ImageTag.Exif;
+            DateTime createdDate = File.GetCreationTime(fullPath);
+            DateTime date = exif.DateTimeOriginal ?? exif.DateTime ?? file.ImageTag.DateTime ?? createdDate;
+
+            return new PhotoFile(fullPath, date, createdDate, file);
+        }
+        /// <summary>
+        /// Processes an MP4 file.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="fullPath"></param>
+        /// <returns></returns>
+        private PhotoFile ProcessTagFile(TagLib.Mpeg4.File file, string fullPath)
+        {
+            DateTime createdDate = File.GetCreationTime(fullPath);
+
+            return new PhotoFile(fullPath, createdDate, createdDate, file);
+        }
+
+        #endregion
     }
 
-    public interface IMediaFileManager
+    public interface IPhotoFileProcessor
     {
         /// <summary>
         /// Returns all the TagLib Files for the file path.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        Task<IEnumerable<TagLib.File>> GetFiles(string directory);
+        Task<IPhotoCollection> GetFiles(string directory);
         /// <summary>
         /// Returns all the TagLib Files for the file path.
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        IEnumerable<TagLib.File> GetFilesSync(string directory);
+        IPhotoCollection GetFilesSync(string directory);
         /// <summary>
         /// Returns all the TagLib Files for the file path in JSON Format.
         /// </summary>

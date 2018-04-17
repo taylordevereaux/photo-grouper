@@ -4,7 +4,7 @@ using System.IO;
 using Mono.Options;
 using PhotoGrouper.Managers;
 
-namespace PhotoGrouper
+namespace PhotoGrouper.Cli
 {
 
     class Arguments
@@ -14,6 +14,7 @@ namespace PhotoGrouper
 
     class Program
     {
+
         static void Main(string[] args)
         {
             var arguments = new Arguments();
@@ -59,9 +60,13 @@ namespace PhotoGrouper
             // Validate the directory 
             else if (ValidateArguments(arguments))
             {
-                var files = MediaFileManager.GetFilesSync(arguments.Directory);
+                //var files = PhotoFileProcessor.GetFilesSync(arguments.Directory);
 
-                //Console.WriteLine(files);
+                var processor = new PhotoFileProcessor(new Logger());
+
+                var files = processor.GetFilesSync(arguments.Directory);
+
+                Console.WriteLine(files.ToJson().Result);
             }
 
             Console.ReadKey();
