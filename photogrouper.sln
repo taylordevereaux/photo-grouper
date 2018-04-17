@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "photo-grouper", "photo-grouper\photo-grouper.csproj", "{38710B4A-697A-491D-9204-E12C649C5930}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "photogrouper.cli", "photogrouper.cli\photogrouper.cli.csproj", "{38710B4A-697A-491D-9204-E12C649C5930}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "file-manager", "file-manager\file-manager.csproj", "{EE9657E0-FC65-4EFB-9044-9749B3E0547C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "photogrouper", "photogrouper\photogrouper.csproj", "{EE9657E0-FC65-4EFB-9044-9749B3E0547C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "taglib-sharp", "..\taglib-sharp\src\taglib-sharp.csproj", "{BD8B50B8-4E2F-4FCA-BD3E-53E2CA0F74D7}"
 EndProject

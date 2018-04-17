@@ -41,7 +41,7 @@ namespace PhotoGrouper
             else
             {
 #if DEBUG
-                arguments.Directory = "D:\\GalaxyS7\\2018.03.10";
+                arguments.Directory = "E:\\GalaxyS7\\2018.03.10";
 #else
                 do
                 {
@@ -59,7 +59,7 @@ namespace PhotoGrouper
             // Validate the directory 
             else if (ValidateArguments(arguments))
             {
-                var files = FileManager.GetFilesSync(arguments.Directory);
+                var files = MediaFileManager.GetFilesSync(arguments.Directory);
 
                 //Console.WriteLine(files);
             }
