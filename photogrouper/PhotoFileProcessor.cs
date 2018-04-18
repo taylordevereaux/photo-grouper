@@ -60,12 +60,12 @@ namespace PhotoGrouper
                     continue;
                 }
 
+                _logger.WriteLine(file);
                 // Raw image files
                 var tiffFile = tagFile as TagLib.Tiff.File;
                 if (tiffFile != null)
                 {
                     files.Add(ProcessTagFile(tiffFile, file));
-                    _logger.WriteTabbed(file, tiffFile.ImageTag.Exif.DateTime);
                     continue;
                 }
 
@@ -74,7 +74,6 @@ namespace PhotoGrouper
                 if (imageFile != null)
                 {
                     files.Add(ProcessTagFile(imageFile, file));
-                    _logger.WriteTabbed(file, imageFile.ImageTag.Exif.DateTime);
                     continue;
                 }
 
@@ -83,7 +82,6 @@ namespace PhotoGrouper
                 if (mp4File != null)
                 {
                     files.Add(ProcessTagFile(mp4File, file));
-                    _logger.WriteTabbed(file, mp4File.Tag.DateTagged);
                     continue;
                 }
 
@@ -124,7 +122,7 @@ namespace PhotoGrouper
         {
             var exif = file.ImageTag.Exif;
             DateTime createdDate = File.GetCreationTime(fullPath);
-            DateTime date = exif.DateTimeOriginal ?? exif.DateTime ?? file.ImageTag.DateTime ?? createdDate;
+            DateTime date = (exif != null ? (exif.DateTimeOriginal ?? exif.DateTime) : null) ?? file.ImageTag.DateTime ?? createdDate;
 
             return new PhotoFile(fullPath, date, createdDate, file);
         }

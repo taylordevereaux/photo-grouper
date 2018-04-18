@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Mono.Options;
 using PhotoGrouper.Managers;
 
@@ -12,10 +13,10 @@ namespace PhotoGrouper.Cli
         public string Directory = "";
     }
 
-    class Program
+    public class Program
     {
 
-        static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var arguments = new Arguments();
             bool showHelp = false;
@@ -42,7 +43,7 @@ namespace PhotoGrouper.Cli
             else
             {
 #if DEBUG
-                arguments.Directory = "E:\\GalaxyS7\\2018.03.10";
+                arguments.Directory = "C:\\Users\\tdevereaux\\Pictures\\Wallpapers";
 #else
                 do
                 {
@@ -64,9 +65,9 @@ namespace PhotoGrouper.Cli
 
                 var processor = new PhotoFileProcessor(new Logger());
 
-                var files = processor.GetFilesSync(arguments.Directory);
+                var files = await processor.GetFiles(arguments.Directory);
 
-                Console.WriteLine(files.ToJson().Result);
+                Console.WriteLine(await files.ToJson());
             }
 
             Console.ReadKey();
