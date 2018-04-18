@@ -11,6 +11,18 @@ namespace PhotoGrouper.Cli
     class Arguments
     {
         public string Directory = "";
+
+        public bool Group = false;
+
+        public bool UnGroup = false;
+
+        public string DateFormat = "";
+
+        public bool Recursive = false;
+
+        public bool Json = false;
+
+        public bool Log = false;
     }
 
     public class Program
@@ -24,35 +36,54 @@ namespace PhotoGrouper.Cli
             var options = new OptionSet() {
                 // The directory to sort in.
                 { "d|directory=", "the directory to list", d => arguments.Directory = d },
+                { "g|group", "group the photos into folder", g => arguments.Group = g != null },
+                { "u|ungroup", "ungroup the photos in folders", g => arguments.UnGroup = g != null },
+                { "j|json", "return the json result", j => arguments.Json = j != null },
+                { "l|log", "include logs in the results", l => arguments.Log = l != null },
+                { "r|recursive", "recursively search all subfolders for files", g => arguments.Recursive = g != null },
+                { "f|dateformat", "format to group the photos by (Default = yyyy-MM-dd)", a => arguments.DateFormat = a },
                 { "h|help=", "show this message and exit", h => showHelp = h != null }
             };
 
-            if (args.Length > 0)
+            if (args.Length == 0)
             {
-                try
+                while (args.Length == 0)
                 {
-                    options.Parse(args);
+                    Console.Write("photogrouper: ");
+                    // Get the arguments.
+                    string line = Console.ReadLine();
+                    args = line.Split(new char[] {' '}, StringSplitOptions.RemoveEmptyEntries);    
+
+                    if (args.Length > 0)
+                    {
+                        // If arguments are passed directly to the application we will parse them right away.
+                        ParseArguments(args, options);
+                        // Execute the arguments.
+                        await Execute(arguments, showHelp, options);
+
+                        args = new string[0];
+                    }
                 }
-                catch (OptionException e)
-                {
-                    Console.Write("file-sorter: ");
-                    Console.WriteLine(e.Message);
-                    Console.WriteLine("Try 'file-sorter --help' for more information.");
-                }
-            }
-            else
+            } 
+            else if (args.Length > 0)
             {
-#if DEBUG
-                arguments.Directory = "C:\\Users\\tdevereaux\\Pictures\\Temp";
-#else
-                do
-                {
-                    Console.Write("Directory: ");
-                    arguments.Directory = Console.ReadLine();
-                }
-                while (!ValidateArguments(arguments));
-#endif
+                // If arguments are passed directly to the application we will parse them right away.
+                ParseArguments(args, options);
+                // Execute the arguments.
+                await Execute(arguments, showHelp, options);
             }
+
+        }
+
+        /// <summary>
+        /// Executes the application based on the arguments passed.
+        /// </summary>
+        /// <param name="arguments"></param>
+        /// <param name="showHelp"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        private static async Task Execute(Arguments arguments, bool showHelp, OptionSet options)
+        {
             // Display the help if we need to
             if (showHelp)
             {
@@ -61,22 +92,64 @@ namespace PhotoGrouper.Cli
             // Validate the directory 
             else if (ValidateArguments(arguments))
             {
-                //var files = PhotoFileProcessor.GetFilesSync(arguments.Directory);
+                SetDefaultArguments(arguments);
+                
+                var processor = new PhotoFileProcessor((arguments.Log ? (ILogger)new Logger() : new EmptyLogger()));
 
-                var processor = new PhotoFileProcessor(new Logger());
+                var files = await processor.GetFiles(arguments.Directory, arguments.Recursive);
 
-                var files = await processor.GetFiles(arguments.Directory, true);
-
-                files = await files.GroupBy(x => x.Date.Date.ToString("yyyy-MM-dd"));
-
+                if (arguments.Group)
+                    files = await files.GroupBy(x => x.Date.ToString(arguments.DateFormat));
+                else if (arguments.UnGroup)
+                    files = await files.UnGroup();
                 //files = await files.UnGroup();
-
-                Console.WriteLine(await files.ToJson());
+                if (arguments.Json)
+                    Console.WriteLine(await files.ToJson());
             }
-
-            Console.ReadKey();
         }
 
+        /// <summary>
+        /// Sets any default arguments that may not be set.
+        /// </summary>
+        /// <param name="arguments"></param>
+        private static void SetDefaultArguments(Arguments arguments)
+        {
+            if (string.IsNullOrWhiteSpace(arguments.DateFormat))
+                arguments.DateFormat = "yyyy-MM-dd";
+        }
+
+        /// <summary>
+        /// Parses the arguments passed to the console application.
+        /// </summary>
+        /// <param name="args"></param>
+        /// <param name="options"></param>
+        private static void ParseArguments(string[] args, OptionSet options)
+        {
+            RemoveExtraQuotes(args);
+
+            try
+            {
+                options.Parse(args);
+            }
+            catch (OptionException e)
+            {
+                Console.Write("photogrouper: ");
+                Console.WriteLine(e.Message);
+                Console.WriteLine("Try 'photogrouper --help' for more information.");
+            }
+        }
+        /// <summary>
+        /// Removes extra quotes from arguments passed.
+        /// </summary>
+        /// <param name="args"></param>
+        private static void RemoveExtraQuotes(string[] args)
+        {
+            for (int i = 0; i < args.Length; ++i)
+            {
+                if (args[i].Contains("\""))
+                    args[i] = args[i].Replace("\"", "");
+            }
+        }
 
         private static bool ValidateArguments(Arguments arguments)
         {
@@ -99,6 +172,34 @@ namespace PhotoGrouper.Cli
         {
             Console.WriteLine("Help description in progress");
             options.WriteOptionDescriptions(Console.Out);
+        }
+    }
+
+    internal class EmptyLogger : ILogger
+    {
+        public void LineBreak()
+        {
+            //throw new NotImplementedException();
+        }
+
+        public void Write(string message)
+        {
+            //throw new NotImplementedException();
+        }
+
+        public void WriteLine(string message)
+        {
+            //throw new NotImplementedException();
+        }
+
+        public void WriteLine(string message, params object[] arg)
+        {
+            //throw new NotImplementedException();
+        }
+
+        public void WriteTabbed(params object[] arg)
+        {
+            //throw new NotImplementedException();
         }
     }
 }

@@ -65,11 +65,11 @@ namespace PhotoGrouper
                 {
                     tagFile = TagLib.File.Create(file);
                 }
-                catch (NotImplementedException e)
+                catch (NotImplementedException)
                 {
                     _logger.WriteLine("Not Implemented: {0}", file);
                 }
-                catch (TagLib.UnsupportedFormatException e)
+                catch (TagLib.UnsupportedFormatException)
                 {
                     _logger.WriteLine("Unsupported File: {0}", file);
                     //ConsoleHelper.ConsoleLineBreak();
