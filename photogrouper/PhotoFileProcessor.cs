@@ -33,16 +33,32 @@ namespace PhotoGrouper
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
+        public async Task<IPhotoCollection> GetFiles(string path, bool recursive)
+        {
+            return await Task.Run(() => GetFilesSync(path, recursive));
+        }
+        /// <summary>
+        /// Returns all the TagLib Files for the file path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         public IPhotoCollection GetFilesSync(string path)
+        {
+            return GetFilesSync(path, false);
+        }
+        /// <summary>
+        /// Returns all the TagLib Files for the file path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public IPhotoCollection GetFilesSync(string path, bool recursive)
         {
             if (!Directory.Exists(path))
                 throw new ArgumentException("Directory does not exist");
 
-            var fileNames = Directory.GetFiles(path);
-
             List<PhotoFile> files = new List<PhotoFile>();
 
-            foreach (string file in fileNames)
+            foreach (string file in Directory.EnumerateFiles(path, "*", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly))
             {
                 TagLib.File tagFile = null;
                 try
@@ -88,7 +104,7 @@ namespace PhotoGrouper
                 _logger.WriteLine("Unsupported file: {0}", file);
             }
 
-            return new PhotoCollection(files);
+            return new PhotoCollection(files, path);
         }
 
         /// <summary>
@@ -124,7 +140,7 @@ namespace PhotoGrouper
             DateTime createdDate = File.GetCreationTime(fullPath);
             DateTime date = (exif != null ? (exif.DateTimeOriginal ?? exif.DateTime) : null) ?? file.ImageTag.DateTime ?? createdDate;
 
-            return new PhotoFile(fullPath, date, createdDate, file);
+            return new PhotoFile(fullPath, date, createdDate);
         }
         /// <summary>
         /// Processes an MP4 file.
@@ -136,7 +152,7 @@ namespace PhotoGrouper
         {
             DateTime createdDate = File.GetCreationTime(fullPath);
 
-            return new PhotoFile(fullPath, createdDate, createdDate, file);
+            return new PhotoFile(fullPath, createdDate, createdDate);
         }
 
         #endregion
@@ -155,7 +171,19 @@ namespace PhotoGrouper
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
+        Task<IPhotoCollection> GetFiles(string directory, bool recursive);
+        /// <summary>
+        /// Returns all the TagLib Files for the file path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         IPhotoCollection GetFilesSync(string directory);
+        /// <summary>
+        /// Returns all the TagLib Files for the file path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        IPhotoCollection GetFilesSync(string directory, bool recursive);
         /// <summary>
         /// Returns all the TagLib Files for the file path in JSON Format.
         /// </summary>

@@ -43,7 +43,7 @@ namespace PhotoGrouper.Cli
             else
             {
 #if DEBUG
-                arguments.Directory = "C:\\Users\\tdevereaux\\Pictures\\Wallpapers";
+                arguments.Directory = "C:\\Users\\tdevereaux\\Pictures\\Temp";
 #else
                 do
                 {
@@ -65,11 +65,13 @@ namespace PhotoGrouper.Cli
 
                 var processor = new PhotoFileProcessor(new Logger());
 
-                var files = await processor.GetFiles(arguments.Directory);
+                var files = await processor.GetFiles(arguments.Directory, true);
 
-                var grouped = files.GroupBy(x => x.Date.Date.ToString("yyyy-MM-dd"));
+                files = await files.GroupBy(x => x.Date.Date.ToString("yyyy-MM-dd"));
 
-                Console.WriteLine(files.ToJson().Result);
+                //files = await files.UnGroup();
+
+                Console.WriteLine(await files.ToJson());
             }
 
             Console.ReadKey();

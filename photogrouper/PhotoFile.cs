@@ -20,18 +20,18 @@ namespace PhotoGrouper
         /// <param name="date"></param>
         /// <param name="dateCreated"></param>
         /// <param name="file"></param>
-        public PhotoFile(string fileName, DateTime date, DateTime dateCreated, File file)
+        public PhotoFile(string fileName, DateTime date, DateTime dateCreated)
         {
-            FileName = fileName;
+            FilePath = fileName;
             Date = date;
             DateCreated = dateCreated;
-            File = file;
+            //File = file;
         }
 
         /// <summary>
         /// The FileName of the file.
         /// </summary>
-        public string FileName { get; private set; }
+        public string FilePath { get; private set; }
         /// <summary>
         /// The Main Date Associated with the file. (DateTaken, Media Date Created)
         /// </summary>
@@ -43,8 +43,8 @@ namespace PhotoGrouper
         /// <summary>
         /// The Associated TagLib file that was created.
         /// </summary>
-        [JsonIgnore]
-        public TagLib.File File { get; private set; }
+        //[JsonIgnore]
+        //public TagLib.File File { get; private set; }
 
         
     }
