@@ -66,6 +66,8 @@ namespace PhotoGrouper.Cli
 
                 var files = processor.GetFilesSync(arguments.Directory);
 
+                var grouped = files.GroupBy(x => x.Date.Date.ToString("yyyy-MM-dd"));
+
                 Console.WriteLine(files.ToJson().Result);
             }
 

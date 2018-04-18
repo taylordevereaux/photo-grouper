@@ -17,6 +17,29 @@ namespace PhotoGrouper
             this._list.AddRange(files);
         }
 
+        /// <summary>
+        /// Groups Each Photo into a folder based on the specific text value.
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public Dictionary<string, List<PhotoFile>> GroupBy(Func<PhotoFile, string> predicate)
+        {
+            Dictionary<string, List<PhotoFile>> result = new Dictionary<string, List<PhotoFile>>();
+
+            // Overflow check
+            checked
+            {
+                foreach (var file in this._list)
+                {
+                    string groupBy = predicate(file);
+                    result[groupBy] = result.ContainsKey(groupBy) ?  result[groupBy] : new List<PhotoFile>();
+                    result[groupBy].Add(file);
+                }
+            }
+
+            return result;
+        }
+
         public async Task<string> ToJson()
         {
             return await Task.Run(() => ToJsonSync());
@@ -43,5 +66,7 @@ namespace PhotoGrouper
         Task<string> ToJson();
 
         string ToJsonSync();
+
+        Dictionary<string, List<PhotoFile>> GroupBy(Func<PhotoFile, string> predicate);
     }
 }
