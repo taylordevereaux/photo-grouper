@@ -1,12 +1,14 @@
-## Welcome to GitHub Pages
+## Installation
 
-You can use the [editor on GitHub](https://github.com/taylordevereaux/photo-grouper/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+#### Nuget
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+[Todo]
 
-### Markdown
+### Usage
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+#### CLI Commands
+
+`-d --directory <directoryname`
 
 ```markdown
 Syntax highlighted code block
