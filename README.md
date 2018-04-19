@@ -10,7 +10,7 @@
 Usage:
   photogrouper group <directory> [--format|-f] <format> [--recursive|-r] [--log|-l]
   photogrouper ungroup <directory> [--recursive|-r] [--log|-l]
-  photogrouper list <directory> [--recursive|-r]  [--log|-l]
+  photogrouper list <directory> [--recursive|-r]  [--log|-l] [--json|-j]
   photogrouper -h | --help
   photogrouper --version
 
@@ -19,6 +19,7 @@ Options:
   --version       Show version.
   -f --format     Specify the date format for folder grouping [default: yyyy-MM-dd].
   -r --recursive  Includes photos in all sub-directories [default: false].
+  -j --json       Returns the list results in json format.
   -l --log        Logs output to the console window.
 ```
 
