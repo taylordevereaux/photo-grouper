@@ -6,9 +6,21 @@
 
 ### Usage
 
-#### CLI Commands
+```
+Usage:
+  photogrouper group <directory> [--format|-f] <format> [--recursive|-r] [--log|-l]
+  photogrouper ungroup <directory> [--recursive|-r] [--log|-l]
+  photogrouper list <directory> [--recursive|-r]  [--log|-l]
+  photogrouper -h | --help
+  photogrouper --version
 
-`-d --directory <directoryname`
+Options:
+  -h --help       Show commands.
+  --version       Show version.
+  -f --format     Specify the date format for folder grouping [default: yyyy-MM-dd].
+  -r --recursive  Includes photos in all sub-directories [default: false].
+  -l --log        Logs output to the console window.
+```
 
 ```markdown
 Syntax highlighted code block
