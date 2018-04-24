@@ -13,42 +13,45 @@ namespace PhotoGrouper
         /// Writes all the parameters separated by a tab.
         /// </summary>
         /// <param name="arg"></param>
-        public void WriteTabbed(params object[] arg)
+        public Task WriteTabbed(params object[] arg)
         {
-            Console.WriteLine(string.Join("\t", arg));
+            return Task.Run(() => Console.WriteLine(string.Join("\t", arg)));
         }
         /// <summary>
         /// Displays a new Line followed by a line, then by a final new line.
         /// </summary>
-        public void LineBreak()
+        public Task LineBreak()
         {
-            Console.WriteLine();
-            Console.WriteLine("----------------------------------");
-            Console.WriteLine();
+            return Task.Run(() =>
+            {
+                Console.WriteLine();
+                Console.WriteLine("----------------------------------");
+                Console.WriteLine();
+            });
         }
         /// <summary>
         /// Replicates Console.WriteLine
         /// </summary>
         /// <param name="message"></param>
-        public void WriteLine(string message)
+        public Task WriteLine(string message)
         {
-            Console.WriteLine(message);
+            return Task.Run(() => Console.WriteLine(message));
         }
         /// <summary>
         /// Replicates Console.WriteLine
         /// </summary>
         /// <param name="message"></param>
-        public void WriteLine(string message, params object[] arg)
+        public Task WriteLine(string message, params object[] arg)
         {
-            Console.WriteLine(message, arg);
+            return Task.Run(() => Console.WriteLine(message, arg));
         }
         /// <summary>
         /// Replicates Console.Write
         /// </summary>
         /// <param name="message"></param>
-        public void Write(string message)
+        public Task Write(string message)
         {
-            Console.WriteLine(message);
+            return Task.Run(() => Console.WriteLine(message) );
         }
     }
 
@@ -59,25 +62,25 @@ namespace PhotoGrouper
         /// Writes all the parameters separated by a tab.
         /// </summary>
         /// <param name="arg"></param>
-        void WriteTabbed(params object[] arg);
+        Task WriteTabbed(params object[] arg);
         /// <summary>
         /// Displays a new Line followed by a line, then by a final new line.
         /// </summary>
-        void LineBreak();
+        Task LineBreak();
         /// <summary>
         /// Replicates Console.WriteLine
         /// </summary>
         /// <param name="message"></param>
-        void WriteLine(string message);
+        Task WriteLine(string message);
         /// <summary>
         /// Replicates Console.WriteLine
         /// </summary>
         /// <param name="message"></param>
-        void WriteLine(string message, params object[] arg);
+        Task WriteLine(string message, params object[] arg);
         /// <summary>
         /// Replicates Console.Write
         /// </summary>
         /// <param name="message"></param>
-        void Write(string message);
+        Task Write(string message);
     }
 }

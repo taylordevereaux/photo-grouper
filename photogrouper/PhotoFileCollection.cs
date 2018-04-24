@@ -114,6 +114,15 @@ namespace PhotoGrouper
             return ClearAndCreate(newFiles);
         }
 
+        /// <summary>
+        /// The count of photo files.
+        /// </summary>
+        /// <returns></returns>
+        public int Count()
+        {
+            return this._list.Count;
+        }
+
         #region File Helper Methods
         /// <summary>
         /// Moves the file from one location to another.
@@ -198,5 +207,7 @@ namespace PhotoGrouper
         Task<IPhotoCollection> GroupBy(Func<PhotoFile, string> predicate);
 
         Task<IPhotoCollection> UnGroup();
+
+        int Count();
     }
 }

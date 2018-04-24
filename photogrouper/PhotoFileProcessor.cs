@@ -33,9 +33,9 @@ namespace PhotoGrouper
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public async Task<IPhotoCollection> GetFiles(string path, bool recursive)
+        public IPhotoCollection GetFilesSync(string path, bool recursive)
         {
-            return await Task.Run(() => GetFilesSync(path, recursive));
+            return GetFiles(path, recursive).Result;
         }
         /// <summary>
         /// Returns all the TagLib Files for the file path.
@@ -51,7 +51,7 @@ namespace PhotoGrouper
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public IPhotoCollection GetFilesSync(string path, bool recursive)
+        public async Task<IPhotoCollection> GetFiles(string path, bool recursive)
         {
             if (!Directory.Exists(path))
                 throw new ArgumentException("Directory does not exist");
@@ -67,16 +67,20 @@ namespace PhotoGrouper
                 }
                 catch (NotImplementedException)
                 {
-                    _logger.WriteLine("Not Implemented: {0}", file);
+                    await _logger.WriteLine("ERROR: Not Implemented: {0}", file);
                 }
                 catch (TagLib.UnsupportedFormatException)
                 {
-                    _logger.WriteLine("Unsupported File: {0}", file);
-                    //ConsoleHelper.ConsoleLineBreak();
+                    await _logger.WriteLine("ERROR: Unsupported File: {0}", file);
+                    continue;
+                }
+                catch (TagLib.CorruptFileException)
+                {
+                    await _logger.WriteLine("ERROR: File Corrupt: {0}", file);
                     continue;
                 }
 
-                _logger.WriteLine(file);
+                await _logger.WriteLine(file);
                 // Raw image files
                 var tiffFile = tagFile as TagLib.Tiff.File;
                 if (tiffFile != null)
@@ -101,7 +105,7 @@ namespace PhotoGrouper
                     continue;
                 }
 
-                _logger.WriteLine("Unsupported file: {0}", file);
+                await _logger.WriteLine("ERROR: Unsupported file: {0}", file);
             }
 
             return new PhotoCollection(files, path);
