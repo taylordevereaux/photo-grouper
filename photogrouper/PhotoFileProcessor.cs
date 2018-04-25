@@ -80,7 +80,7 @@ namespace PhotoGrouper
                     continue;
                 }
 
-                await _logger.WriteLine(file);
+                //await _logger.WriteLine(file);
                 // Raw image files
                 var tiffFile = tagFile as TagLib.Tiff.File;
                 if (tiffFile != null)

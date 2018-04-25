@@ -27,6 +27,18 @@ namespace PhotoGrouper
             DateCreated = dateCreated;
             //File = file;
         }
+        /// <summary>
+        /// Creates a new Media File Instance.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="date"></param>
+        /// <param name="dateCreated"></param>
+        /// <param name="file"></param>
+        public PhotoFile(string fileName, DateTime date, DateTime dateCreated, string oldFilePath)
+            : this(fileName, date, dateCreated)
+        {
+            this.OldFilePath = oldFilePath;
+        }
 
         /// <summary>
         /// The FileName of the file.
@@ -41,11 +53,10 @@ namespace PhotoGrouper
         /// </summary>
         public DateTime DateCreated { get; private set; }
         /// <summary>
-        /// The Associated TagLib file that was created.
+        /// The New FileName of the file.
         /// </summary>
-        //[JsonIgnore]
-        //public TagLib.File File { get; private set; }
+        public string OldFilePath { get; private set; }
 
-        
+
     }
 }

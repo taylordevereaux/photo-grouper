@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Mono.Options;
 using PhotoGrouper.Cli.Loggers;
-using PhotoGrouper.Managers;
 
 namespace PhotoGrouper.Cli
 {
@@ -38,7 +37,7 @@ namespace PhotoGrouper.Cli
                         }
                         catch (Exception e)
                         {
-                            Console.Write("ERROR: " + e.Message);
+                            Console.WriteLine("ERROR: " + e.Message);
                         }
                         args = new string[0];
                     }
@@ -250,28 +249,42 @@ namespace PhotoGrouper.Cli
 
             if (arguments.Command == "group")
             {
-                if (!arguments.ConfirmPrompt || ConfirmGroup(files, arguments))
-                    files = await files.GroupBy(x => x.Date.ToString(arguments.Format));
+                files = await HandleConfirm(files.GroupBy(x => x.Date.ToString(arguments.Format)), arguments);
             }
             else if (arguments.Command == "ungroup")
-            {
-                if (!arguments.ConfirmPrompt || ConfirmUnGroup(files, arguments))
-                    files = await files.UnGroup();
+            { 
+                files = await HandleConfirm(files.UnGroup(), arguments);                
             }
             else if (arguments.Command == "list")
             {
-                //files = await files.UnGroup();
-                if (arguments.Json)
-                    Console.WriteLine(await files.ToJson());
-                else
-                {
-                    StringBuilder br = new StringBuilder();
-                    foreach (var file in files)
-                        br.AppendLine(file.FilePath);
-                    Console.WriteLine(br.ToString());
-                }
+                await ListFiles(files, arguments);
             }
         }
+
+        #region Commands
+
+        /// <summary>
+        /// Lists the files out to the user.
+        /// </summary>
+        /// <param name="arguments"></param>
+        /// <param name="files"></param>
+        /// <returns></returns>
+        private async Task ListFiles(IPhotoCollection files, Arguments arguments)
+        {
+            //files = await files.UnGroup();
+            if (arguments.Json)
+                Console.WriteLine(await files.ToJson());
+            else
+            {
+                StringBuilder br = new StringBuilder();
+                foreach (var file in files)
+                    br.AppendLine(file.FilePath);
+                Console.WriteLine(br.ToString());
+            }
+        }
+
+        #endregion
+
         #region Confirm Prompts
         /// <summary>
         /// Confirm the grouping based on the arguments passed.
@@ -279,13 +292,26 @@ namespace PhotoGrouper.Cli
         /// <param name="files"></param>
         /// <param name="arguments"></param>
         /// <returns></returns>
-        private bool ConfirmUnGroup(IPhotoCollection files, Arguments arguments)
+        private async Task<IPhotoCollection> HandleConfirm(IPhotoCollection files, Arguments arguments)
         {
 
-            Console.WriteLine("Ungroup {0} files into directory {1} from sub-directories and removing any empty sub-directories?"
-                , files.Count()
-                , arguments.Directory);
-            return ConfirmYes();
+            IProgress<int> updateProgress = new Progress<int>(percentage =>
+            {
+                Console.Write("\rProgress: {0}%", percentage);
+            });
+
+            int fileCount = files.Count();
+
+            if (!arguments.ConfirmPrompt || await ConfirmPrompt(files, arguments))
+            {
+                Console.Write("Progress: 0%");
+
+                files = await files.Confirm(updateProgress);
+
+                Console.WriteLine("\nSuccessfully moved {0} files.", fileCount);
+            }
+
+            return files;
         }
 
         /// <summary>
@@ -294,26 +320,19 @@ namespace PhotoGrouper.Cli
         /// <param name="files"></param>
         /// <param name="arguments"></param>
         /// <returns></returns>
-        private bool ConfirmGroup(IPhotoCollection files, Arguments arguments)
+        private async Task<bool> ConfirmPrompt(IPhotoCollection files, Arguments arguments)
         {
-            Console.WriteLine("Group {0} files from directory {1}{2} into folders by date taken, formated as '{3}'?"
-                , files.Count()
-                , arguments.Directory
-                , arguments.Recursive ? " and sub-directories" : ""
-                , arguments.Format);
-            return ConfirmYes();
-        }
+            await ListFiles(files, arguments);
 
-        /// <summary>
-        /// Reads the input from the user and gets yes or no input.
-        /// </summary>
-        /// <returns></returns>
-        private bool ConfirmYes()
-        {
+            Console.WriteLine("Confirm moving {0} files?"
+                , files.Count());
+
             Console.Write("[Y] Yes (default), [N] No: ");
+
             string key = Console.ReadLine();
             return key.StartsWith("Y") || key.StartsWith("y");
         }
+
         #endregion
     }
     /// <summary>
