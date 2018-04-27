@@ -82,6 +82,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandParser.cs" />
+    <Compile Include="Arguments.cs" />
+    <Compile Include="CommandExecuter.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="HelpCommand.cs" />
     <Compile Include="Loggers\EmptyLogger.cs" />
     <Compile Include="Loggers\TextLogger.cs" />
     <Compile Include="Options.cs" />

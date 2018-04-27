@@ -32,7 +32,7 @@ namespace PhotoGrouper
             // Invalid folder characters used to validate the new group by folder names.
             char[] invalidCharacters = Path.GetInvalidPathChars();
 
-            return RenameFiles(file => {
+            return MoveFiles(file => {
 
                 string groupBy = predicate(file);
                 // We need to validate the groupBy folder contains no invalid characters.
@@ -54,36 +54,18 @@ namespace PhotoGrouper
         /// <returns></returns>
         public IPhotoCollection UnGroup()
         {
-            return RenameFiles(file => Path.Combine(_directory, Path.GetFileName(file.FilePath)));
+            return MoveFiles(file => Path.Combine(_directory, Path.GetFileName(file.FilePath)));
         }
 
         /// <summary>
-        /// Renames the files based on the getFileName predicate.
+        /// Moves the files to a new folder.
         /// </summary>
-        /// <param name="getFileName"></param>
         /// <returns></returns>
-        private IPhotoCollection RenameFiles(Func<PhotoFile,string> getFileName)
+        public IPhotoCollection Move(string directory)
         {
-            /// The new list of photo files we'll use to create a new photo collection to return from.
-            List<PhotoFile> newFiles = new List<PhotoFile>();
-
-            foreach (var file in this._list)
-            {
-                // Validate the file still exists.
-                if (!File.Exists(file.FilePath))
-                    throw new FileDoesNotExistException(String.Format("File no longer exists: {0}", file.FilePath));
-
-                string newFileName = getFileName(file);
-
-                // Validate the new file doesn't already exist.
-                if (!Path.Equals(file.FilePath, newFileName) && File.Exists(newFileName))
-                    throw new FileExistsException(String.Format("File already exists: {0}", newFileName));
-
-                // Add the new file with updated file path.
-                newFiles.Add(new PhotoFile(newFileName, file.Date, file.DateCreated, file.FilePath));
-            }
-            /// Clear and recreate ourselfs.
-            return ClearAndCreate(newFiles);
+            string oldDirectory = this._directory;
+            this._directory = directory;
+            return MoveFiles(file => Path.Combine(_directory, file.FilePath.Replace(oldDirectory, "")));
         }
 
         /// <summary>
@@ -159,6 +141,35 @@ namespace PhotoGrouper
         }
 
         #region File Helper Methods
+
+        /// <summary>
+        /// Renames the files based on the getFileName predicate.
+        /// </summary>
+        /// <param name="getNewPath"></param>
+        /// <returns></returns>
+        private IPhotoCollection MoveFiles(Func<PhotoFile, string> getNewPath)
+        {
+            /// The new list of photo files we'll use to create a new photo collection to return from.
+            List<PhotoFile> newFiles = new List<PhotoFile>();
+
+            foreach (var file in this._list)
+            {
+                // Validate the file still exists.
+                if (!File.Exists(file.FilePath))
+                    throw new FileDoesNotExistException(String.Format("File no longer exists: {0}", file.FilePath));
+
+                string newFilePath = getNewPath(file);
+
+                // Validate the new file doesn't already exist.
+                if (!Path.Equals(file.FilePath, newFilePath) && File.Exists(newFilePath))
+                    throw new FileExistsException(String.Format("File already exists: {0}", newFilePath));
+
+                // Add the new file with updated file path.
+                newFiles.Add(new PhotoFile(newFilePath, file.Date, file.DateCreated, file.FilePath));
+            }
+            /// Clear and recreate ourselfs.
+            return ClearAndCreate(newFiles);
+        }
         /// <summary>
         /// Moves the file from one location to another.
         /// </summary>
@@ -242,6 +253,8 @@ namespace PhotoGrouper
         IPhotoCollection GroupBy(Func<PhotoFile, string> predicate);
 
         IPhotoCollection UnGroup();
+
+        IPhotoCollection Move(string directory);
 
         Task<IPhotoCollection> Confirm();
 
