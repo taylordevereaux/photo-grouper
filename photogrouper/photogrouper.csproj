@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EmptyLogger.cs" />
     <Compile Include="Exceptions\Exceptions.cs" />
     <Compile Include="PhotoFile.cs" />
     <Compile Include="PhotoFileCollection.cs" />

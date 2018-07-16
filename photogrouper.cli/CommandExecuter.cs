@@ -18,9 +18,16 @@ namespace PhotoGrouper.Cli
 
         public async Task Execute(IEnumerable<CommandArguments> arguments)
         {
+            IProgress<int> updateParsing = new Progress<int>(percentage =>
+            {
+                Console.Write("\rParsing: {0}%", percentage);
+            });
+
             var argument = arguments.First();
             //var processor = new PhotoFileProcessor((arguments.Log ? new TextLogger() : promptToConfirm ? (ILogger)new Logger() : new EmptyLogger()));
-            var files = await _processor.GetFiles(argument.Directory, argument.Recursive);
+            var files = await _processor.GetFiles(argument.Directory, argument.Recursive, updateParsing);
+            // After showing the parsing progress we hide the text.
+            Console.Write("\r");
 
             foreach (var a in arguments)
                 files = await Execute(a, files);

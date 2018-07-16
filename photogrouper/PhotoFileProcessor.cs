@@ -26,7 +26,7 @@ namespace PhotoGrouper
         /// <returns></returns>
         public async Task<IPhotoCollection> GetFiles(string path)
         {
-            return await Task.Run(() => GetFilesSync(path));
+            return await GetFiles(path, false, null);
         }
         /// <summary>
         /// Returns all the TagLib Files for the file path.
@@ -35,7 +35,7 @@ namespace PhotoGrouper
         /// <returns></returns>
         public IPhotoCollection GetFilesSync(string path, bool recursive)
         {
-            return GetFiles(path, recursive).Result;
+            return GetFiles(path, recursive, null).Result;
         }
         /// <summary>
         /// Returns all the TagLib Files for the file path.
@@ -51,19 +51,25 @@ namespace PhotoGrouper
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public async Task<IPhotoCollection> GetFiles(string path, bool recursive)
+        public async Task<IPhotoCollection> GetFiles(string path, bool recursive, IProgress<int> update)
         {
             if (!Directory.Exists(path))
                 throw new ArgumentException("Directory does not exist");
 
             List<PhotoFile> files = new List<PhotoFile>();
 
-            foreach (string file in Directory.EnumerateFiles(path, "*", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly))
+            var enumerator = Directory.EnumerateFiles(path, "*", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+            int index = 0;
+            int count = enumerator.Count();
+            foreach (string file in enumerator)
             {
                 TagLib.File tagFile = null;
                 try
                 {
-                    tagFile = TagLib.File.Create(file);
+                    index++;
+                    update?.Report(index * 100 / count);
+
+                    tagFile = await GetTagLibfile(file, tagFile);
                 }
                 catch (NotImplementedException)
                 {
@@ -110,6 +116,13 @@ namespace PhotoGrouper
 
             return new PhotoCollection(files, path);
         }
+        /// <summary>
+        /// Gets the taglib file asynchronously.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="tagFile"></param>
+        /// <returns></returns>
+        private static async Task<TagLib.File> GetTagLibfile(string file, TagLib.File tagFile) => await Task.Run(() => TagLib.File.Create(file) );
 
         /// <summary>
         /// Returns all the TagLib Files for the file path in JSON Format.
@@ -175,7 +188,7 @@ namespace PhotoGrouper
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        Task<IPhotoCollection> GetFiles(string directory, bool recursive);
+        Task<IPhotoCollection> GetFiles(string directory, bool recursive, IProgress<int> update);
         /// <summary>
         /// Returns all the TagLib Files for the file path.
         /// </summary>

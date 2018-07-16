@@ -122,9 +122,6 @@ namespace PhotoGrouper
                     newFiles.Add(new PhotoFile(newFileName, file.Date, File.GetCreationTime(newFileName)));
 
                     DeleteFileAndEmptyDirectory(oldFileName);
-
-                    System.Threading.Thread.Sleep(50);
-
                 }
             }
             /// Clear and recreate ourselfs.

@@ -133,7 +133,7 @@ namespace PhotoGrouper.Cli
         /// Sets any default arguments that may not be set.
         /// </summary>
         /// <param name="arguments"></param>
-        private void SetDefaultArguments(CommandArguments arguments)
+        public static void SetDefaultArguments(CommandArguments arguments)
         {
             if (string.IsNullOrWhiteSpace(arguments.Directory))
                 arguments.Directory = Directory.GetCurrentDirectory();
@@ -144,7 +144,7 @@ namespace PhotoGrouper.Cli
         /// Removes extra quotes from arguments passed.
         /// </summary>
         /// <param name="args"></param>
-        private void RemoveExtraQuotes(string[] args)
+        public static void RemoveExtraQuotes(string[] args)
         {
             for (int i = 0; i < args.Length; ++i)
             {

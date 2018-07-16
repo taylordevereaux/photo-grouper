@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "photogrouper", "photogroupe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "taglib-sharp", "..\taglib-sharp\src\taglib-sharp.csproj", "{BD8B50B8-4E2F-4FCA-BD3E-53E2CA0F74D7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "photogrouper.tests", "photogrouper.tests\photogrouper.tests.csproj", "{D2C2F3A1-8D88-4118-95CC-5DEAFB786CA2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{BD8B50B8-4E2F-4FCA-BD3E-53E2CA0F74D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD8B50B8-4E2F-4FCA-BD3E-53E2CA0F74D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD8B50B8-4E2F-4FCA-BD3E-53E2CA0F74D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2C2F3A1-8D88-4118-95CC-5DEAFB786CA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2C2F3A1-8D88-4118-95CC-5DEAFB786CA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2C2F3A1-8D88-4118-95CC-5DEAFB786CA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2C2F3A1-8D88-4118-95CC-5DEAFB786CA2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
